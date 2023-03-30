@@ -10,9 +10,12 @@ from skimage.color import rgb2gray
 # Create map object
 m = folium.Map(location=[22.269, 79.717], zoom_start=5)
 
+
+
 # Overlay geotiff file on map
+
 ## RGB Image
-in_path = '.\\assets\\tif_files\multi_band.tif'
+in_path = '.\\assets\\tif_files\multi_band_new.tif'
 
 with rio.open(in_path) as src:
     
@@ -37,13 +40,14 @@ for item in bounds_orig:
 centre_lon = bounds_fin[0][1] + (bounds_fin[1][1] - bounds_fin[0][1])/2
 centre_lat = bounds_fin[0][0] + (bounds_fin[1][0] - bounds_fin[0][0])/2
 
-# masking zero values
-img1 = np.where(img.any(0,keepdims=True),img,np.nan)
-img1 = rgb2gray(np.transpose(img1, (1, 2, 0)))
-# img1 = img1.transpose(1, 2, 0)
+img1 = img.transpose(1, 2, 0)
 
-folium.raster_layers.ImageOverlay(img1, opacity=1, 
-                                 bounds = bounds_fin).add_to(m)
+
+
+overlay_image = folium.raster_layers.ImageOverlay(img1, opacity=1, 
+                                 bounds = bounds_fin)
+overlay_image.add_to(m)
+
 
 
 # Display India state boundaries as geojson file
@@ -59,10 +63,13 @@ folium.GeoJson('.//assets/india_state_boundary/New_India_State_Boundary.geojson'
 #     location=[12.97,77.59],
 #     radius=30000,
 #     popup='Bengaluru',
-#     color='#428bca',
-#     fill=True,
-#     fill_color='#428bca'
+#     # color='#428bca',
+#     # fill=True,
+#     fill_color='#f5f5f5',
+#     opacity=0.0
 # ).add_to(m)
+
+
 
 # Generate map
 m.save('map.html')
